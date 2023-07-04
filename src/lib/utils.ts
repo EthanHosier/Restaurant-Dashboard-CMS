@@ -116,7 +116,7 @@ export const toBlob = (dataURI: string, type:string) => {
   }
 
   // Create Blob from Uint8Array with image MIME type
-  const blob = new Blob([new Uint8Array(byteArrays)], { type: `image/${type}` });
+  const blob = new Blob([new Uint8Array(byteArrays)], { type });
   return blob;
 };
 
@@ -162,4 +162,15 @@ export function getRestaurantName(locationId:string, allLocations: Location[]){
   const foundLocation = allLocations.find(l => l.locationId === locationId);
 
   return foundLocation ? foundLocation.name : "";
+}
+
+
+export function extractFileType(dataUrl: string): string | null {
+  const match = dataUrl.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9]+)(;base64)?,/);
+
+  if (match && match.length >= 2) {
+    return match[1];
+  }
+
+  return null;
 }

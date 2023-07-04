@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { Card, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import SetLocalImage from "./website/SetLocalImage"
-import { isBinaryImage, toBlob, toTitleCase, defaultLocalImages } from '@/lib/utils';
+import { isBinaryImage, toBlob, toTitleCase, defaultLocalImages, extractFileType } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { Trash2, Loader2, Save, Info } from 'lucide-react';
+import { Trash2, Loader2, Save, Info, Plus } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import useAuth from '@/hooks/useAuth';
@@ -18,6 +18,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Checkbox } from './ui/checkbox';
+import SetMenu from './website/SetMenu';
+import Menu from '@/types/Website/Menu';
 
 const emptyWebsite: WebsiteType = {
   colors: {
@@ -32,7 +34,7 @@ const emptyWebsite: WebsiteType = {
   logo: '',
   slogan: '',
   navOptions: [],
-  bookUrl: '/book',
+  bookUrl: '',
   infoTitle: '',
   infoText: '',
   reviews: [
@@ -68,6 +70,8 @@ const emptyWebsite: WebsiteType = {
   url: "",
   offerGiftCards: false,
   giftCardUrl: "",
+  menus: [],
+  useExternalBookingSystem: false,
 }
 
 const COLOR_NAME_MAP = {
@@ -127,7 +131,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
       const location = `${auth.user.uid}/logo`;
       const logoRef = ref(storage, location);
 
-      const blob = toBlob(localUploadTemporaryImages.logo, "png"); //LOGO IS PNG
+      const blob = toBlob(localUploadTemporaryImages.logo, "image/png"); //LOGO IS PNG
       promises.push(uploadBytes(logoRef, blob));
 
       upload.logo = location;
@@ -147,7 +151,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
         const location = `${auth.user.uid}/backgrounds/${key}`;
         const bgRef = ref(storage, location);
 
-        const blob = toBlob(localUploadTemporaryImages.backgrounds[key], "avif");
+        const blob = toBlob(localUploadTemporaryImages.backgrounds[key], "image/avif");
         promises.push(uploadBytes(bgRef, blob));
 
 
@@ -166,7 +170,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
         const location = `${auth.user.uid}/images/${i}`;
         const imgRef = ref(storage, location);
 
-        const blob = toBlob(img, "avif");
+        const blob = toBlob(img, "image/avif");
         promises.push(uploadBytes(imgRef, blob));
 
 
@@ -180,7 +184,35 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
     })
 
-    //try upload the images
+
+
+    //##############
+
+    //menus:
+    websiteData.menus.forEach((menu, i) => {
+      //if(!menu.url) return; ?????
+
+      if (isBinaryImage(menu.url)) {
+        const location = `${auth.user.uid}/menus/${i}`;
+        const menuRef = ref(storage, location);
+
+        const fileType: string = extractFileType(menu.url) ?? "";
+        const blob = toBlob(menu.url, fileType);
+
+        const metaData = {
+          contentType: fileType,
+        };
+
+        promises.push(uploadBytes(menuRef, blob, metaData));
+
+        upload.menus[i].url = location;
+      }
+
+
+    })
+
+
+    //try upload the images + menus
     try {
       await Promise.all(promises);
     } catch (error: any) {
@@ -188,7 +220,6 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
       console.log(`Error uploading images: ${error}`);
     }
 
-    //##############
     try {
       const websiteDocRef = doc(db, "websites", auth.user.uid);
       console.log({ upload })
@@ -208,6 +239,46 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
   }
 
+  ////////////////////////////////////////////////
+
+  const addMenu = () => {
+    websiteData.menus ? websiteData.menus.push({ url: "", name: `Menu ${websiteData.menus.length + 1}` }) : websiteData.menus = [{ url: "", name: "Menu 1" }];
+    setWebsiteData(w => ({ ...w }))
+    enableSaving();
+  }
+
+  const setMenu = (url: string, menuIndex: number) => {
+    const tempMenus: Menu[] = websiteData.menus ?? [];
+
+    tempMenus[menuIndex].url = url ?? "";
+    setWebsiteData(w => {
+      const tempWebsite = { ...w }
+      tempWebsite.menus = tempMenus;
+      return tempWebsite;
+    })
+
+    console.log({ url })
+
+    enableSaving();
+  }
+
+  const removeMenu = (index: number) => {
+    websiteData.menus.splice(index, 1);
+    setWebsiteData(w => ({ ...w }));
+    enableSaving();
+  }
+
+  const setMenuName = (name: string, index: number) => {
+    websiteData.menus[index].name = name;
+    setWebsiteData(w => ({ ...w }));
+    enableSaving();
+  }
+
+  const removeMenuUrl = (index: number) => {
+    websiteData.menus[index].url = "";
+    setWebsiteData(w => ({ ...w }));
+    enableSaving();
+  }
 
   //////////////////////////////////////////////////
 
@@ -384,6 +455,18 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
     enableSaving();
   }
 
+  const toggleUseExternalBookingSystem = () => {
+    websiteData.useExternalBookingSystem = !websiteData.useExternalBookingSystem;
+    setWebsiteData(w => ({ ...w }));
+    enableSaving();
+  }
+
+  const handleExternalBookingSystemUrlChange = (url: string) => {
+    websiteData.bookUrl = url;
+    setWebsiteData(w => ({...w}));
+    enableSaving();
+  }
+
   return (
     <div className='flex flex-col items-start'>
       {error && <p className='text-red-600'>Please contact support. Error: {error}</p>}
@@ -474,6 +557,41 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
           </Card>
 
           <Card className='mb-4 p-4'>
+            <CardTitle>Menus</CardTitle>
+
+
+            {websiteData?.menus?.map((menu, i) => (
+              <div className={`flex flex-col ${i > 0 && "mt-4"}`}>
+
+                <div className='flex w-full justify-between items-center'>
+                  <SetMenu src={menu.url} setMenu={setMenu} removeMenuUrl={removeMenuUrl} index={i} key={i} />
+                  <Button variant={"ghost"} onClick={() => removeMenu(i)}>
+                    <Trash2 />
+                  </Button>
+                </div>
+
+
+                <p className='font-semibold mt-2'>Menu Name</p>
+                <input
+                  id={`menu-name-${i}`}
+                  name={`menu-name-${i}`}
+                  value={menu.name}
+                  onChange={(e) => setMenuName(e.target.value, i)}
+                  className="h-12 flex-1 p-2 border border-gray-300 rounded mt-2"
+                />
+
+              </div>
+            ))}
+
+            <Button onClick={addMenu} className='mt-4'>
+              <Plus size={16} color="white" className='mr-2' />
+              Add Menu
+            </Button>
+
+
+          </Card>
+
+          <Card className='mb-4 p-4'>
             <CardTitle>Gift Cards</CardTitle>
 
             <div className='flex items-center my-2 mt-4'>
@@ -500,6 +618,32 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
             }
 
 
+          </Card>
+
+          <Card className='mb-4 p-4'>
+            <CardTitle>Bookings</CardTitle>
+            <div className='flex items-center my-2 mt-4'>
+              <p className='mr-2'>Use booking system which is different to the one that we offer:</p>
+              <Checkbox
+                checked={websiteData.useExternalBookingSystem ?? false}
+                onClick={toggleUseExternalBookingSystem}
+              />
+            </div>
+
+            {
+              websiteData.useExternalBookingSystem &&
+              <div className='flex items-center'>
+                <p className='font-semibold mr-2'>URL</p>
+                <input
+                  type="text"
+                  id="url"
+                  name="url"
+                  value={websiteData.bookUrl}
+                  onChange={(e) => handleExternalBookingSystemUrlChange(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+            }
           </Card>
 
           <Card className='p-4 mb-4'>
@@ -788,6 +932,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
               type='button'
               onClick={addSocialMediaLink}
             >
+              <Plus size={16} color='white' className='mr-2' />
               Add Social Media
             </Button>
 

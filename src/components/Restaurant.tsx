@@ -395,7 +395,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
             <Button
               className=''
               onClick={addVenue}
-            ><Plus size={16} color="white" /> <p className="ml-2">Add Venue</p></Button>
+            ><Plus size={16} color="white" className="mr-2"/> <p className="ml-2">Add Venue</p></Button>
             <div className='w-full'>
               <form className="w-full mx-auto mt-4" onSubmit={handleSubmit}>
 
@@ -647,6 +647,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
                           type='button'
                           onClick={() => addTable(location)}
                         >
+                          <Plus size={16} color="white" className="mr-2"/> 
                           Add Table
                         </Button>
                       </Card>
@@ -719,6 +720,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
                               type='button'
                               onClick={() => addPickupDelivery(location, CheckboxType.Pickup)}
                             >
+                              <Plus size={16} color="white" className="mr-2"/> 
                               Add Pickup Option
                             </Button>
                           </Card>
@@ -791,6 +793,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
                               type='button'
                               onClick={() => addPickupDelivery(location, CheckboxType.Delivery)}
                             >
+                              <Plus size={16} color="white" className="mr-2"/> 
                               Add Delivery Option
                             </Button>
                           </Card>
@@ -855,6 +858,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
                           type='button'
                           onClick={() => addReviewOption(location)}
                         >
+                          <Plus size={16} color="white" className="mr-2"/> 
                           Add Review Option
                         </Button>
                       </Card>

@@ -3,13 +3,14 @@ import Review from "./Review";
 import SocialMediaLink from "./SocialMediaLink";
 import Backgrounds from "./Backgrounds";
 import Colors from "./Colors";
+import Menu from "./Menu";
 
 export default interface Website {
   colors: Colors,
   name: string,
   slogan: string,
   navOptions: DropdownOption[],
-  bookUrl: "/book",
+  bookUrl: string,
   infoTitle: /*h1*/ string,
   infoText: /*p1*/ string,
   reviews: Review[],
@@ -22,4 +23,6 @@ export default interface Website {
   url: string,
   offerGiftCards: boolean,
   giftCardUrl: string,
+  menus: Menu[],
+  useExternalBookingSystem: boolean,
 }

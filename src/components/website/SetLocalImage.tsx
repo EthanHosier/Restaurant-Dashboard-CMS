@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { X, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -102,7 +102,7 @@ const SetLocalImage = ({ localImageSrc, websiteImageSrc, name, handleRestoreImag
             <button className='absolute rounded-full shadow p-2 bg-white border -mt-2 -ml-2' onClick={() => removeLocalImage(name, imageType, imageIndex)} type='button'>
               <X size={12} />
             </button>
-            <img src={(localImageSrc && localImageSrc != "DELETE") ? localImageSrc : websiteImageSrc} className={`w-full extra-images cursor-pointer ${cover ? "object-cover aspect-square" : "object-contain"}`} alt={`${name} image`} />
+            <img src={(localImageSrc && localImageSrc != "DELETE") ? localImageSrc : websiteImageSrc} className={`w-full extra-images cursor-pointer ${cover ? "object-cover aspect-square" : "object-contain"} max-h-48`} alt={`${name} image`} />
           </div>
           :
           <div className='relative w-full h-full'>

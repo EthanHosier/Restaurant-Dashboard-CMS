@@ -1,12 +1,11 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -16,13 +15,11 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { isToday, isTomorrow, truncateComment } from "@/lib/utils"
+import {truncateComment } from "@/lib/utils"
 import EditCutomerNotes from "./EditCustomerNotes";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -79,7 +76,7 @@ export const columns: ColumnDef<Customer>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
+      //const payment = row.original
 
       return (
         <DropdownMenu>

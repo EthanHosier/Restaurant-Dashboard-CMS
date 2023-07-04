@@ -8,6 +8,7 @@ import BookingData from '@/types/BookingData'
 import { getTimeString, dateIsToday, dateIsFuture, dateIsPast, getCustomerNotes } from '@/lib/utils'
 import { Link } from "react-router-dom";
 import UserProfile from '@/types/UserProfile'
+import useAuth from '@/hooks/useAuth'
 
 const iconWidth = 20;
 
@@ -17,12 +18,15 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
   const futureBookings = allBookings.filter(e => dateIsFuture(e.date));
   const pastBookings = allBookings.filter(e => dateIsPast(e.date));
 
+  const auth = useAuth();
+
+
   function getData(bookings: BookingData[], selectedLocation: string): Booking[] {
     //async
     //: Promise<Payment[]>
     // Fetch data from your API here.
 
-    const data = bookings.filter(b => b.locationId === selectedLocation || selectedLocation === "all").map((b, i) => {
+    const data = bookings.filter(b => b.locationId === selectedLocation || selectedLocation === "all").map((b) => {
       const {
         id,
         startDateTime,
@@ -32,7 +36,6 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
         email,
         partySize,
         comments,
-        locationId,
         restaurantId,
         restaurantTitle,
         location,
@@ -57,7 +60,8 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
           customerNotes: getCustomerNotes(email, userProfiles)
         }
       )
-    }).sort((a, b) => /*(new Date(a.date) - new Date(b.date))*/ 1); // this works, idk why error. (so that bookings are in time order)
+    }).sort((a, b) => (new Date(a.date) as any) - (new Date(b.date) as any))
+
 
 
     return data;
@@ -65,22 +69,22 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
 
   return (
     <>
-      <Link to="https://google.com" target={"_blank"} className='inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 mt-2 -mb-4 w-36'>
+      <Link to={`https://d303vz01x9nm1g.cloudfront.net?restaurantId=${auth.user.uid}`} target={"_blank"} className='inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 mt-2 -mb-4 w-36'>
         <div className='flex items-center'>
           <Plus size={16} color="white" /><p className='ml-1'>New Booking</p>
         </div>
       </Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         <div>
-          <DataCard title="Today's Bookings" value={todaysBookings.length} comment="+1 than average" icon={<Calendar width={iconWidth} />} />
+          <DataCard title="Today's Bookings" value={todaysBookings.length} comment="" icon={<Calendar width={iconWidth} />} />
         </div> {/* Component A */}
 
         <div>
-          <DataCard title="Upcoming Bookings" value={allBookings.length - pastBookings.length} comment="+3 today" icon={<CalendarClock width={iconWidth} />} />
+          <DataCard title="Upcoming Bookings" value={allBookings.length - pastBookings.length} comment="" icon={<CalendarClock width={iconWidth} />} />
         </div> {/* Component B */}
 
         <div>
-          <DataCard title="Total Bookings" value={allBookings.length} comment="+1 than average" icon={<CalendarCheck width={iconWidth} />} />
+          <DataCard title="Total Bookings" value={allBookings.length} comment="" icon={<CalendarCheck width={iconWidth} />} />
         </div> {/* Component A */}
 
 

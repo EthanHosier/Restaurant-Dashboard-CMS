@@ -17,16 +17,14 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { isToday, isTomorrow, truncateComment } from "@/lib/utils"
-import { collection, deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import {
   HoverCard,
@@ -149,12 +147,10 @@ export const columns: ColumnDef<Booking>[] = [
     cell: ({ row }) => {
       //console.log(row.original.comments)
 
-      const payment = row.original
       const date: Date = row.getValue("date");
 
       const dateToCheck = new Date(date);
 
-      let num = 1;
 
       const currentDate = new Date();
       currentDate.setHours(0, 0, 0, 0);
@@ -192,7 +188,7 @@ export const columns: ColumnDef<Booking>[] = [
 
           const body = { email, id, restaurantTitle, location, reason, messageId };
 
-          const res = await fetch(URL, {
+          /*const res =*/ await fetch(URL, {
             method: "POST",
             headers: {
               'Content-Type': 'application/json',

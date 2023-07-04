@@ -1,6 +1,7 @@
 import OpeningTimes from "./OpeningTimes";
 import PickupDeliveryOption from "./PickupDeliveryOption";
 import Table from "./Table";
+import ReviewOption from "./ReviewOption";
 
 export default interface Location {
   locationId: string,
@@ -16,5 +17,6 @@ export default interface Location {
   pickup: boolean,
   delivery: boolean,
   pickupOptions: PickupDeliveryOption[],
-  deliveryOptions: PickupDeliveryOption[]
+  deliveryOptions: PickupDeliveryOption[],
+  reviewOptions: ReviewOption[],
 }

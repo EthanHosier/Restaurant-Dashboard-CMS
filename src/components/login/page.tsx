@@ -1,15 +1,8 @@
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import { login } from "../../firebase/auth"
 import { Button } from '../ui/button'
 import { FcGoogle } from 'react-icons/fc';
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
 const page = () => {

@@ -1,5 +1,5 @@
 import type WebsiteType from '@/types/Website/Website';
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import SetLocalImage from "./website/SetLocalImage"
@@ -63,7 +63,8 @@ const emptyWebsite: WebsiteType = {
     delivery: "",
     contactUs: "",
   },
-  images: ["", "", "", "", "", ""]
+  images: ["", "", "", "", "", ""],
+  url: "",
 }
 
 const COLOR_NAME_MAP = {
@@ -94,6 +95,11 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
   const [error, setError] = useState<string>("");
 
 
+  useEffect(() => {
+    if(!storedWebsite) return;
+    setWebsiteData(storedWebsite);
+  }, [storedWebsite])
+
   const enableSaving = () => setCanSave(true);
 
   const auth = useAuth();
@@ -101,7 +107,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    
+
     setSaveLoading(true);
 
     let upload = { ...websiteData };
@@ -141,7 +147,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
         const blob = toBlob(localUploadTemporaryImages.backgrounds[key], "avif");
         promises.push(uploadBytes(bgRef, blob));
 
-        
+
         upload.backgrounds[key_] = location;
 
       } else if (localUploadTemporaryImages.backgrounds[key] === "DELETE") {
@@ -205,7 +211,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
   const setLocalImage = (url: string, name: string, imageType: ImageType, imageIndex: number) => {
 
     const tempLocalImages = { logo: localUploadTemporaryImages.logo, backgrounds: { ...localUploadTemporaryImages.backgrounds }, images: [...localUploadTemporaryImages.images] }
-    
+
     switch (imageType) {
       case ImageType.Background:
         let name_ = name as keyof typeof tempLocalImages.backgrounds;
@@ -403,18 +409,30 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
             <CardTitle>General</CardTitle>
             <div className="my-4">
               <>
+                <label htmlFor="location" className="block font-medium mb-1">
+                  URL
+                </label>
+                <input
+                  type="text"
+                  id="url"
+                  name="url"
+                  value={websiteData.url}
+                  className="w-full p-2 border border-gray-300 rounded mb-4"
+                  disabled
+                  />
+
                 {Object.keys(COLOR_NAME_MAP).map((key, i) => {
 
                   return (
                     <div key={i} className={`${i == 3 && "mt-4"}`}>
                       <label htmlFor={key} className="block font-medium mb-2">
-                        {/*COLOR_NAME_MAP[key]*/}
+                        {COLOR_NAME_MAP[key as keyof typeof COLOR_NAME_MAP]}
                       </label>
                       <input
                         type="color"
                         id={key}
                         name={key}
-                        //value={websiteData.colors[key] ?? "#ffffff"}
+                        value={websiteData.colors[key as keyof typeof COLOR_NAME_MAP] ?? "#ffffff"}
                         onChange={(event) => handleColChange(key, event.target.value)}
                         className="mb-8"
                       />

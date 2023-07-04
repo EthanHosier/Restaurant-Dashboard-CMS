@@ -1,12 +1,11 @@
 "use client"
  
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -19,7 +18,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -42,6 +40,8 @@ export type PendingReview = {
   partySize: Number,
   customerNotes: string,
   restaurantId: string,
+  websiteUrl: string,
+  restaurantName: string,
 }
 
 export const columns: ColumnDef<PendingReview>[] = [
@@ -117,7 +117,7 @@ export const columns: ColumnDef<PendingReview>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
+      //const payment = row.original
  
       //console.log({HERE: row.original})
 

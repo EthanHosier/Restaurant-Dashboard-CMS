@@ -17,7 +17,7 @@ import Login from "./components/login/page"
 import { signOutUser } from "./firebase/auth"
 
 import { db } from "./firebase/config";
-import { collection, query, where, onSnapshot, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
 import BookingData from '@/types/BookingData' //the type
 import { defaultLocalImages, getDeepCopyOfObject } from '@/lib/utils'
 
@@ -54,8 +54,6 @@ export default function App() {
   const [hasRestaurant, setHasRestaurant] = useState<boolean>();
 
   useEffect(() => {
-
-
     if (!auth.user) {
       setLoadingAgain(false);
       setLoading(false);
@@ -89,7 +87,8 @@ export default function App() {
             delivery,
             pickup,
             deliveryOptions,
-            pickupOptions
+            pickupOptions,
+            reviewOptions,
           } = doc.data();
 
           //could just make ll = doc.data()???
@@ -109,7 +108,8 @@ export default function App() {
             delivery,
             pickup,
             deliveryOptions,
-            pickupOptions
+            pickupOptions,
+            reviewOptions: reviewOptions ?? [],
           };
 
           resLocations.push(ll);
@@ -247,11 +247,12 @@ export default function App() {
   }, [auth.user])
 
 
-
-
+  useEffect(() => {
+    console.log(auth)
+  }, [auth])
 
   //hacky but oh well
-  return auth.loading == undefined || auth.loading || loading || loadingAgain ? (<Loadingpg />) :
+  return auth.loading || loading || loadingAgain ? (<Loadingpg />) :
     !auth.user ? <Login /> :
       !hasRestaurant ? <NewAccount /> :
         (
@@ -296,7 +297,7 @@ export default function App() {
 
 
                   <TabsContent value="bookings"><Bookings bookings={bookings} selectedLocation={selectedLocation} userProfiles={userProfiles} /></TabsContent>
-                  <TabsContent value="customers"><Customers bookings={bookings} selectedLocation={selectedLocation} allLocations={locations} userProfiles={userProfiles} /></TabsContent>
+                  <TabsContent value="customers"><Customers bookings={bookings} selectedLocation={selectedLocation} allLocations={locations} userProfiles={userProfiles} websiteUrl={websiteData?.url ?? ""}/></TabsContent>
                   <TabsContent value="venues"><Restaurant bookings={bookings} locations={locations} /></TabsContent>
                   <TabsContent value="website"><Website storedWebsite={websiteData} signedUrls={signedUrls} /></TabsContent>
                 </Tabs>

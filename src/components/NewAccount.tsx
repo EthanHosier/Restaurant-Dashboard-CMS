@@ -1,5 +1,4 @@
 import useAuth from '@/hooks/useAuth'
-import React from 'react'
 import { Card, CardContent, CardTitle } from './ui/card'
 
 const NewAccount = () => {

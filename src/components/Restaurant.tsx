@@ -1,4 +1,4 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardTitle } from './ui/card'
 import { generateTimeIntervals, toTitleCase, DAYS_OF_WEEK } from '@/lib/utils'
@@ -29,12 +29,19 @@ import { collection, deleteDoc, doc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import useAuth from '@/hooks/useAuth'
 import { Checkbox } from "@/components/ui/checkbox"
-
+import ReviewOption from '@/types/ReviewOption'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const DEFAULT_TABLE_SIZE: number = 1;
 
 const DELIVERY_OPTIONS = ["uber eats", "deliveroo", "just eat"]
 const PICKUP_OPTIONS = /*(["A", "B", "C"]*/ DELIVERY_OPTIONS;
+const REVIEW_OPTIONS = ["google", "yelp", "tripadvisor"]
 
 enum CheckboxType {
   Pickup,
@@ -89,6 +96,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
       delivery: false,
       pickupOptions: [],
       deliveryOptions: [],
+      reviewOptions: [],
       openingTimes: {
         monday: {
           open: "00:00",
@@ -195,8 +203,31 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
 
   }
 
-  const handleChangeDefault = (location: Location, key: keyof Location, value: string) => {
-    location[key] = value;
+  const handleChangeDefault = (location: Location, key: string, value: string) => {
+
+    switch (key) {
+      case "name": {
+        location.name = value;
+        break;
+      }
+      case "location": {
+        location.location = value;
+        break;
+      }
+      case "address": {
+        location.address = value;
+        break;
+      }
+      case "contactNumber": {
+        location.contactNumber = value;
+        break;
+      }
+      case "contactEmail": {
+        location.contactEmail = value;
+        break;
+      }
+    }
+
     setFormData(f => [...f]);
     enableSaving();
   };
@@ -204,10 +235,10 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
 
 
   const handleOpenCloseTimeChange = (location: Location, day: number, type: string, time: string) => {
-    
+
     const dow = DAYS_OF_WEEK[day];
 
-    const key =  dow as keyof typeof location.openingTimes;
+    const key = dow as keyof typeof location.openingTimes;
     if (type == "open") {
       location.openingTimes[key].open = time;
       if (location.openingTimes[key].close < time) {
@@ -299,8 +330,6 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
     location[options][index].type = type;
     setFormData(f => [...f]);
     enableSaving();
-
-
   }
 
   const changePickupDeliveryUrl = (location: Location, checkboxType: CheckboxType, index: number, url: string) => {
@@ -311,7 +340,32 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
     setFormData(f => [...f]);
     enableSaving();
 
+  }
 
+  //review options:
+  const addReviewOption = (location: Location) => {
+    const element: ReviewOption = { type: "google", url: "" };
+    location.reviewOptions ? location.reviewOptions.push(element) : location.reviewOptions = [element];
+    setFormData(f => [...f]);
+    enableSaving();
+  }
+
+  const removeReviewOption = (location: Location, index: number) => {
+    location.reviewOptions.splice(index, 1);
+    setFormData(f => [...f]);
+    enableSaving();
+  }
+
+  const changeReviewOptionType = (location: Location, index: number, type: string) => {
+    location.reviewOptions[index].type = type;
+    setFormData(f => [...f]);
+    enableSaving();
+  }
+
+  const changeReviewOptionUrl = (location: Location, index: number, url: string) => {
+    location.reviewOptions[index].url = url;
+    setFormData(f => [...f]);
+    enableSaving();
   }
 
   return (
@@ -323,423 +377,496 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
         </div>
         :
         <>
-          <Button
-            className='mt-2'
-            onClick={addVenue}
-          ><Plus size={16} color="white" /> <p className="ml-2">Add Venue</p></Button>
-          <div className='w-full'>
-            <form className="w-full mx-auto mt-4" onSubmit={handleSubmit}>
+          <Card className='w-full p-4 mt-4 bg-[#F1F5F9]'>
+            <Card className="p-4 mb-4 w-full">
+              <CardTitle>Common Questions</CardTitle>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Why aren't my URLs working?</AccordionTrigger>
+                  <AccordionContent>
+                    Please ensure that you are including the "https://" part at the start of each url. For example "https://www.google.com"
+                    will work, but "www.google.com" will not work.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
-              <Button
-                disabled={saveLoading || !canSave}
-                className={`${!canSave ? "bg-[#E4EAF1]" : "bg-green-600"} hover:bg-green-500 fixed bottom-6 right-6 p-6`}
-                type='submit'
-              >
-                {saveLoading ? <Loader2 className='animate-spin' size={20} /> : <Save size={20} color="white" />}
-                <p className='ml-2 text-xl'>Save</p>
-              </Button>
+            </Card>
 
-              <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-4">
-                {formData.map((location, i) => (
-                  <Card className='p-4 mb-16 w-full xl:flex-1' key={i}> {/* ##################################### */}
+            <Button
+              className=''
+              onClick={addVenue}
+            ><Plus size={16} color="white" /> <p className="ml-2">Add Venue</p></Button>
+            <div className='w-full'>
+              <form className="w-full mx-auto mt-4" onSubmit={handleSubmit}>
 
-                    <div className='w-full flex justify-between mt-4'>
-                      <CardTitle className='text-xl'>
-                        Venue {i + 1}
-                      </CardTitle>
+                <Button
+                  disabled={saveLoading || !canSave}
+                  className={`${!canSave ? "bg-[#E4EAF1]" : "bg-green-600"} hover:bg-green-500 fixed bottom-6 right-6 p-6`}
+                  type='submit'
+                >
+                  {saveLoading ? <Loader2 className='animate-spin' size={20} /> : <Save size={20} color="white" />}
+                  <p className='ml-2 text-xl'>Save</p>
+                </Button>
+
+                <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  {formData.map((location, i) => (
+                    <Card className='p-4 mb-16 w-full xl:flex-1' key={i}> {/* ##################################### */}
+
+                      <div className='w-full flex justify-between mt-4'>
+                        <CardTitle className='text-xl'>
+                          Venue {i + 1}
+                        </CardTitle>
 
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger><MoreHorizontal /></DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuLabel>Venu {i + 1}</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger><MoreHorizontal /></DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuLabel>Venu {i + 1}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <div className='w-full'>
+                              <AlertDialog>
+                                <AlertDialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
+                                  <div className='flex items-center'>
+                                    <p className='text-start text-sm mr-1'>Delete</p>
+                                  </div>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete {location.name ? `${location.name} ` : "this venue "}
+                                      from our database.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleRemoveLocation(location.locationId)}>Delete</AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+
+
+                      </div>
+
+                      <div className="my-4">
+                        <label htmlFor="restaurantName" className="block font-medium mb-1">
+                          {/*Restaurant Name*/}Venue Name
+                        </label>
+                        <input
+                          type="text"
+                          id="restaurantName"
+                          name="restaurantName"
+                          value={location.name}
+                          onChange={(e) => handleChangeDefault(location, "name", e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label htmlFor="location" className="block font-medium mb-1">
+                          Location
+                        </label>
+                        <input
+                          type="text"
+                          id="location"
+                          name="location"
+                          value={location.location}
+                          onChange={(e) => handleChangeDefault(location, "location", e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label htmlFor="address" className="block font-medium mb-1">
+                          Address
+                        </label>
+                        <input
+                          type="text"
+                          id="address"
+                          name="address"
+                          value={location.address}
+                          onChange={(e) => handleChangeDefault(location, "address", e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                          required
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="contactNumber" className="block font-medium mb-1">
+                          Contact Number
+                        </label>
+                        <input
+                          type="tel"
+                          id="contactNumber"
+                          name="contactNumber"
+                          value={location.contactNumber}
+                          onChange={(e) => handleChangeDefault(location, "contactNumber", e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                          title="Please enter a valid phone number"
+                          required
+                        />
+
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="contactEmail" className="block font-medium mb-1">
+                          Contact Email
+                        </label>
+                        <input
+                          type="email"
+                          id="contactEmail"
+                          name="contactEmail"
+                          value={location.contactEmail}
+                          onChange={(e) => handleChangeDefault(location, "contactEmail", e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                          required
+                        />
+                      </div>
+
+                      <div className="my-4">
+                        <label htmlFor="restaurantName" className="block font-medium mb-1">
+                          {/*Restaurant Name*/}Maximum Stay Duration (mins)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          id={`maxStay}`}
+                          name={`maxStay`}
+                          value={location.maxStayDuration}
+                          onChange={(e) => handleMaxStayDurationChange(location, parseInt(e.target.value))}
+                          className="flex-1 p-2 border border-gray-300 rounded w-full"
+                        />
+                      </div>
+
+                      <Card className='p-4 mt-4'>
+
+                        <CardTitle>
+                          Opening Times
+                        </CardTitle>
+
+                        {Object.keys(location.openingTimes).sort((a, b) => {
+                          const order = DAYS_OF_WEEK;
+                          return order.indexOf(a) - order.indexOf(b);
+                        }).map((e, i) => (
+                          <div key={i}>
+                            <div className='flex justify-around items-center mt-4'>
+                              <p className='text-md w-28 font-normal'>
+                                {toTitleCase(e)}
+                              </p>
+                              <div className="mb-4 w-28">
+                                {
+                                  i === 0 && <label htmlFor="mondayOpen" className="block font-medium mb-1">
+                                    Opening Time
+                                  </label>
+                                }
+                                <select
+                                  id="mondayOpen"
+                                  name="mondayOpen"
+                                  value={location.openingTimes[DAYS_OF_WEEK[i] as keyof typeof location.openingTimes]?.open}
+                                  onChange={(e) => handleOpenCloseTimeChange(location, i, "open", e.target.value)}
+                                  className="w-full p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
+                                  required
+                                >
+                                  {/*<option value="">Opening time</option>*/}
+                                  {timeIntervals.map((time) => (
+                                    <option key={time} value={time}>
+                                      {time}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="mb-4 w-28">
+
+                                {i === 0 &&
+                                  <label htmlFor="mondayClose" className="block font-medium mb-1">
+                                    Closing Time
+                                  </label>
+                                }
+                                <select
+                                  id="mondayClose"
+                                  name="mondayClose"
+                                  value={location.openingTimes[DAYS_OF_WEEK[i] as keyof typeof location.openingTimes]?.close}
+                                  onChange={(e) => handleOpenCloseTimeChange(location, i, "close", e.target.value)}
+                                  className="w-full p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
+                                  required
+                                >
+                                  {/*<option value="">Closing time</option>*/}
+                                  {timeIntervals.map((time) => (
+                                    <option key={time} value={time}>
+                                      {time}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </Card>
+
+
+                      <Card className='mt-4 p-4'>
+                        <CardTitle>
+                          Tables
+                        </CardTitle>
+
+                        <div className='w-full flex flex-col'>
+                          {location.tables.length > 0 && <p className='ml-[38px] mt-4 font-medium mb-2'>Capacity</p>}
                           <div className='w-full'>
-                            <AlertDialog>
-                              <AlertDialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
-                                <div className='flex items-center'>
-                                  <p className='text-start text-sm mr-1'>Delete</p>
-                                </div>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete {location.name ? `${location.name} ` : "this venue "}
-                                    from our database.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleRemoveLocation(location.locationId)}>Delete</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                            {location.tables.map((table, j) => (
+                              <div key={j} className="flex items-center gap-4 mb-4">
+                                <p className='w-6'>{j + 1}.</p>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  id={`table-${j}`}
+                                  name={`table-${j}`}
+                                  value={table.capacity}
+                                  onChange={(e) => handleCapacityChange(location, table.id, parseInt(e.target.value))}
+                                  className="flex-1 p-2 border border-gray-300 rounded w-1/2" //i have no clue why putting w-1/2 fixes this on small screens but oh well fuck it
+                                />
+
+                                <Button
+                                  type="button"
+                                  onClick={() => handleRemoveTable(location, table.id)}
+                                  variant="ghost"
+                                  className=''
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </div>
+                            ))}
                           </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
 
-
-
-                    </div>
-
-                    <div className="my-4">
-                      <label htmlFor="restaurantName" className="block font-medium mb-1">
-                        {/*Restaurant Name*/}Venue Name
-                      </label>
-                      <input
-                        type="text"
-                        id="restaurantName"
-                        name="restaurantName"
-                        value={location.name}
-                        onChange={(e) => handleChangeDefault(location, "name", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label htmlFor="location" className="block font-medium mb-1">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        id="location"
-                        name="location"
-                        value={location.location}
-                        onChange={(e) => handleChangeDefault(location, "location", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label htmlFor="address" className="block font-medium mb-1">
-                        Address
-                      </label>
-                      <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={location.address}
-                        onChange={(e) => handleChangeDefault(location, "address", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="contactNumber" className="block font-medium mb-1">
-                        Contact Number
-                      </label>
-                      <input
-                        type="tel"
-                        id="contactNumber"
-                        name="contactNumber"
-                        pattern="[0-9+ -]+"
-                        value={location.contactNumber}
-                        onChange={(e) => handleChangeDefault(location, "contactNumber", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        title="Please enter a valid phone number"
-                        required
-                      />
-
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="contactEmail" className="block font-medium mb-1">
-                        Contact Email
-                      </label>
-                      <input
-                        type="email"
-                        id="contactEmail"
-                        name="contactEmail"
-                        value={location.contactEmail}
-                        onChange={(e) => handleChangeDefault(location, "contactEmail", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required
-                      />
-                    </div>
-
-                    <div className="my-4">
-                      <label htmlFor="restaurantName" className="block font-medium mb-1">
-                        {/*Restaurant Name*/}Maximum Stay Duration (mins)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        id={`maxStay}`}
-                        name={`maxStay`}
-                        value={location.maxStayDuration}
-                        onChange={(e) => handleMaxStayDurationChange(location, parseInt(e.target.value))}
-                        className="flex-1 p-2 border border-gray-300 rounded w-full"
-                      />
-                    </div>
-
-                    <Card className='p-4 mt-4'>
-
-                      <CardTitle>
-                        Opening Times
-                      </CardTitle>
-
-                      {Object.keys(location.openingTimes).sort((a, b) => {
-                        const order = DAYS_OF_WEEK;
-                        return order.indexOf(a) - order.indexOf(b);
-                      }).map((e, i) => (
-                        <div key={i}>
-                          <div className='flex justify-around items-center mt-4'>
-                            <p className='text-md w-28 font-normal'>
-                              {toTitleCase(e)}
-                            </p>
-                            <div className="mb-4 w-28">
-                              {
-                                i === 0 && <label htmlFor="mondayOpen" className="block font-medium mb-1">
-                                  Opening Time
-                                </label>
-                              }
-                              <select
-                                id="mondayOpen"
-                                name="mondayOpen"
-                                value={location.openingTimes[DAYS_OF_WEEK[i] as keyof typeof location.openingTimes]?.open}
-                                onChange={(e) => handleOpenCloseTimeChange(location, i, "open", e.target.value)}
-                                className="w-full p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
-                                required
-                              >
-                                {/*<option value="">Opening time</option>*/}
-                                {timeIntervals.map((time) => (
-                                  <option key={time} value={time}>
-                                    {time}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="mb-4 w-28">
-
-                              {i === 0 &&
-                                <label htmlFor="mondayClose" className="block font-medium mb-1">
-                                  Closing Time
-                                </label>
-                              }
-                              <select
-                                id="mondayClose"
-                                name="mondayClose"
-                                value={location.openingTimes[DAYS_OF_WEEK[i] as keyof typeof location.openingTimes]?.close}
-                                onChange={(e) => handleOpenCloseTimeChange(location, i, "close", e.target.value)}
-                                className="w-full p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
-                                required
-                              >
-                                {/*<option value="">Closing time</option>*/}
-                                {timeIntervals.map((time) => (
-                                  <option key={time} value={time}>
-                                    {time}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
                         </div>
-                      ))}
-                    </Card>
+                        <Button
+                          className='ml-[40px] mt-4'
+                          type='button'
+                          onClick={() => addTable(location)}
+                        >
+                          Add Table
+                        </Button>
+                      </Card>
 
 
-                    <Card className='mt-4 p-4'>
-                      <CardTitle>
-                        Tables
-                      </CardTitle>
+                      <Card className='p-4 mt-4'>
+                        <CardTitle>Pickup & Delivery</CardTitle>
 
-                      <div className='w-full flex flex-col'>
-                        {location.tables.length > 0 && <p className='ml-[38px] mt-4 font-medium mb-2'>Capacity</p>}
-                        <div className='w-full'>
-                          {location.tables.map((table, j) => (
-                            <div key={j} className="flex items-center gap-4 mb-4">
-                              <p className='w-6'>{j + 1}.</p>
-                              <input
-                                type="number"
-                                min="0"
-                                id={`table-${j}`}
-                                name={`table-${j}`}
-                                value={table.capacity}
-                                onChange={(e) => handleCapacityChange(location, table.id, parseInt(e.target.value))}
-                                className="flex-1 p-2 border border-gray-300 rounded w-1/2" //i have no clue why putting w-1/2 fixes this on small screens but oh well fuck it
-                              />
-
-                              <Button
-                                type="button"
-                                onClick={() => handleRemoveTable(location, table.id)}
-                                variant="ghost"
-                                className=''
-                              >
-                                <Trash2 />
-                              </Button>
-                            </div>
-                          ))}
+                        <div className='flex items-center my-2 mt-4'>
+                          <Checkbox
+                            checked={location.pickup}
+                            onClick={() => handleCheckboxChange(location, CheckboxType.Pickup)}
+                          />
+                          <p className='ml-2'>Pickup</p>
                         </div>
 
-                      </div>
-                      <Button
-                        className='ml-[40px] mt-4'
-                        type='button'
-                        onClick={() => addTable(location)}
-                      >
-                        Add Table
-                      </Button>
+                        {
+                          location.pickup &&
+                          <Card className="p-4 overflow-auto">
+                            <CardTitle>Pickup Options</CardTitle>
+                            <div className='w-full flex flex-col'>
+                              {location.pickup && location.pickupOptions.length > 0 &&
+                                <div className='flex mt-4 w-8 mb-2'>
+                                  <p className='font-medium '>Type</p>
+                                  <p className='ml-[106px] font-medium'>URL</p>
+                                </div>
+                              }
+
+                              <div className='w-full'>
+                                {location.pickupOptions.map((pickupOption, j) => (
+                                  <div key={j} className="flex items-center gap-4 mb-4">
+                                    <select
+                                      id={`pickupOption${toTitleCase(location.name)}${j}`}
+                                      name={`pickupOption${toTitleCase(location.name)}${j}`}
+                                      value={pickupOption.type}
+                                      onChange={(e) => changePickupDeliveryType(location, CheckboxType.Pickup, j, e.target.value)}
+                                      className="w-32 p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
+                                      required
+                                    >
+                                      {PICKUP_OPTIONS.map((type) => (
+                                        <option key={type} value={type}>
+                                          {toTitleCase(type)}
+                                        </option>
+                                      ))}
+                                    </select>
+
+                                    <input
+                                      id={`pickupUrl-${j}`}
+                                      name={`pickupUrl-${j}`}
+                                      value={pickupOption.url}
+                                      onChange={(e) => changePickupDeliveryUrl(location, CheckboxType.Pickup, j, e.target.value)}
+                                      className="flex-1 p-2 border border-gray-300 rounded"
+                                    />
+
+                                    <Button
+                                      type="button"
+                                      onClick={() => removePickupDelivery(location, CheckboxType.Pickup, j)}
+                                      variant="ghost"
+                                      className=''
+                                    >
+                                      <Trash2 />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+
+                            </div>
+                            <Button
+                              className='mt-4'
+                              type='button'
+                              onClick={() => addPickupDelivery(location, CheckboxType.Pickup)}
+                            >
+                              Add Pickup Option
+                            </Button>
+                          </Card>
+
+                        }
+
+                        <div className='flex items-center my-2 mt-4'>
+                          <Checkbox
+                            checked={location.delivery}
+                            onClick={() => handleCheckboxChange(location, CheckboxType.Delivery)}
+
+                          />
+                          <p className='ml-2'>Delivery</p>
+                        </div>
+
+
+                        {
+                          location.delivery &&
+                          <Card className="p-4 overflow-auto">
+                            <CardTitle>Delivery Options</CardTitle>
+                            <div className='w-full flex flex-col'>
+                              {location.deliveryOptions.length > 0 &&
+                                <div className='flex mt-4 w-8 mb-2'>
+                                  <p className='font-medium '>Type</p>
+                                  <p className='ml-[106px] font-medium'>URL</p>
+                                </div>
+                              }
+
+                              <div className='w-full'>
+                                {location.deliveryOptions.map((deliveryOption, j) => (
+                                  <div key={j} className="flex items-center gap-4 mb-4">
+                                    <select
+                                      id={`deliveryOption${toTitleCase(location.name)}${j}`}
+                                      name={`deliveryOption${toTitleCase(location.name)}${j}`}
+                                      value={deliveryOption.type}
+                                      onChange={(e) => changePickupDeliveryType(location, CheckboxType.Delivery, j, e.target.value)}
+                                      className="w-32 p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
+                                      required
+                                    >
+                                      {DELIVERY_OPTIONS.map((type) => (
+                                        <option key={type} value={type}>
+                                          {toTitleCase(type)}
+                                        </option>
+                                      ))}
+                                    </select>
+
+                                    <input
+                                      id={`deliveryUrl-${j}`}
+                                      name={`deliveryUrl-${j}`}
+                                      value={deliveryOption.url}
+                                      onChange={(e) => changePickupDeliveryUrl(location, CheckboxType.Delivery, j, e.target.value)}
+                                      className="flex-1 p-2 border border-gray-300 rounded"
+                                    />
+
+                                    <Button
+                                      type="button"
+                                      onClick={() => removePickupDelivery(location, CheckboxType.Delivery, j)}
+                                      variant="ghost"
+                                      className=''
+                                    >
+                                      <Trash2 />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+
+                            </div>
+                            <Button
+                              className='mt-4'
+                              type='button'
+                              onClick={() => addPickupDelivery(location, CheckboxType.Delivery)}
+                            >
+                              Add Delivery Option
+                            </Button>
+                          </Card>
+
+                        }
+                      </Card>
+
+                      <Card className='p-4 mt-4'>
+                        <CardTitle className='mb-4'>
+                          Review Options
+                        </CardTitle>
+
+                        <div className='w-full flex flex-col'>
+                          {location.reviewOptions?.length > 0 &&
+                            <div className='flex mt-4 w-8 mb-2'>
+                              <p className='font-medium '>Type</p>
+                              <p className='ml-[106px] font-medium'>URL</p>
+                            </div>
+                          }
+
+                          <div className='w-full'>
+                            {location.reviewOptions?.map((reviewOption, j) => (
+                              <div key={j} className="flex items-center gap-4 mb-4">
+                                <select
+                                  id={`reviewOption${toTitleCase(location.name)}${j}`}
+                                  name={`reviewOption${toTitleCase(location.name)}${j}`}
+                                  value={reviewOption.type}
+                                  onChange={(e) => changeReviewOptionType(location, j, e.target.value)}
+                                  className="w-32 p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
+                                  required
+                                >
+                                  {REVIEW_OPTIONS.map((type) => (
+                                    <option key={type} value={type}>
+                                      {toTitleCase(type)}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                <input
+                                  id={`reviewOptionUrl-${j}`}
+                                  name={`reviewOptionUrl-${j}`}
+                                  value={reviewOption.url}
+                                  onChange={(e) => changeReviewOptionUrl(location, j, e.target.value)}
+                                  className="flex-1 p-2 border border-gray-300 rounded"
+                                />
+
+                                <Button
+                                  type="button"
+                                  onClick={() => removeReviewOption(location, j)}
+                                  variant="ghost"
+                                  className=''
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+
+                        </div>
+                        <Button
+                          className='mt-4'
+                          type='button'
+                          onClick={() => addReviewOption(location)}
+                        >
+                          Add Review Option
+                        </Button>
+                      </Card>
+
                     </Card>
 
+                  ))}
+                </div>
 
-                    <Card className='p-4 mt-4'>
-                      <CardTitle>Pickup & Delivery</CardTitle>
-
-                      <div className='flex items-center my-2 mt-4'>
-                        <Checkbox
-                          checked={location.pickup}
-                          onClick={() => handleCheckboxChange(location, CheckboxType.Pickup)}
-                        />
-                        <p className='ml-2'>Pickup</p>
-                      </div>
-
-                      {
-                        location.pickup &&
-                        <Card className="p-4 overflow-auto">
-                          <CardTitle>Pickup Options</CardTitle>
-                          <div className='w-full flex flex-col'>
-                            {location.pickup && location.pickupOptions.length > 0 &&
-                              <div className='flex mt-4 w-8 mb-2'>
-                                <p className='font-medium '>Type</p>
-                                <p className='ml-[106px] font-medium'>Url</p>
-                              </div>
-                            }
-
-                            <div className='w-full'>
-                              {location.pickupOptions.map((pickupOption, j) => (
-                                <div key={j} className="flex items-center gap-4 mb-4">
-                                  <select
-                                    id={`pickupOption${toTitleCase(location.name)}${j}`}
-                                    name={`pickupOption${toTitleCase(location.name)}${j}`}
-                                    value={pickupOption.type}
-                                    onChange={(e) => changePickupDeliveryType(location, CheckboxType.Pickup, j, e.target.value)}
-                                    className="w-32 p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
-                                    required
-                                  >
-                                    {PICKUP_OPTIONS.map((type) => (
-                                      <option key={type} value={type}>
-                                        {toTitleCase(type)}
-                                      </option>
-                                    ))}
-                                  </select>
-
-                                  <input
-                                    id={`pickupUrl-${j}`}
-                                    name={`pickupUrl-${j}`}
-                                    value={pickupOption.url}
-                                    onChange={(e) => changePickupDeliveryUrl(location, CheckboxType.Pickup, j, e.target.value)}
-                                    className="flex-1 p-2 border border-gray-300 rounded"
-                                  />
-
-                                  <Button
-                                    type="button"
-                                    onClick={() => removePickupDelivery(location, CheckboxType.Pickup, j)}
-                                    variant="ghost"
-                                    className=''
-                                  >
-                                    <Trash2 />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-
-                          </div>
-                          <Button
-                            className='mt-4'
-                            type='button'
-                            onClick={() => addPickupDelivery(location, CheckboxType.Pickup)}
-                          >
-                            Add Pickup Option
-                          </Button>
-                        </Card>
-
-                      }
-
-                      <div className='flex items-center my-2 mt-4'>
-                        <Checkbox
-                          checked={location.delivery}
-                          onClick={() => handleCheckboxChange(location, CheckboxType.Delivery)}
-
-                        />
-                        <p className='ml-2'>Delivery</p>
-                      </div>
-
-
-                      {
-                        location.delivery &&
-                        <Card className="p-4 overflow-auto">
-                          <CardTitle>Delivery Options</CardTitle>
-                          <div className='w-full flex flex-col'>
-                            {location.deliveryOptions.length > 0 &&
-                              <div className='flex mt-4 w-8 mb-2'>
-                                <p className='font-medium '>Type</p>
-                                <p className='ml-[106px] font-medium'>Url</p>
-                              </div>
-                            }
-
-                            <div className='w-full'>
-                              {location.deliveryOptions.map((deliveryOption, j) => (
-                                <div key={j} className="flex items-center gap-4 mb-4">
-                                  <select
-                                    id={`deliveryOption${toTitleCase(location.name)}${j}`}
-                                    name={`deliveryOption${toTitleCase(location.name)}${j}`}
-                                    value={deliveryOption.type}
-                                    onChange={(e) => changePickupDeliveryType(location, CheckboxType.Delivery, j, e.target.value)}
-                                    className="w-32 p-2 border border-[#E2E8F0] rounded bg-[#F1F5F9]"
-                                    required
-                                  >
-                                    {DELIVERY_OPTIONS.map((type) => (
-                                      <option key={type} value={type}>
-                                        {toTitleCase(type)}
-                                      </option>
-                                    ))}
-                                  </select>
-
-                                  <input
-                                    id={`deliveryUrl-${j}`}
-                                    name={`deliveryUrl-${j}`}
-                                    value={deliveryOption.url}
-                                    onChange={(e) => changePickupDeliveryUrl(location, CheckboxType.Delivery, j, e.target.value)}
-                                    className="flex-1 p-2 border border-gray-300 rounded"
-                                  />
-
-                                  <Button
-                                    type="button"
-                                    onClick={() => removePickupDelivery(location, CheckboxType.Delivery, j)}
-                                    variant="ghost"
-                                    className=''
-                                  >
-                                    <Trash2 />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-
-                          </div>
-                          <Button
-                            className='mt-4'
-                            type='button'
-                            onClick={() => addPickupDelivery(location, CheckboxType.Delivery)}
-                          >
-                            Add Delivery Option
-                          </Button>
-                        </Card>
-
-                      }
-                    </Card>
-
-
-                  </Card>
-
-                ))}
-              </div>
-
-
-
-            </form>
-          </div>
+              </form>
+            </div>
+          </Card>
         </>
       }
     </div>

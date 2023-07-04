@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from '../ui/button'
 import { useToast } from "@/components/ui/use-toast"
 import { doc, setDoc } from 'firebase/firestore'

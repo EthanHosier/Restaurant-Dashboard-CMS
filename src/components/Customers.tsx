@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Calendar, CalendarClock, Users, BadgeCheck } from 'lucide-react'
+import {Users, BadgeCheck } from 'lucide-react'
 
 import { PendingReview, columns as reviewColumns } from './table/pending-reviews-columns'
 import { Customer, columns as allCustomerColumns } from "./table/customers-columns"
@@ -8,13 +6,13 @@ import { DataTable } from "./table/data-table"
 import DataCard from "./DataCard"
 import BookingData from '@/types/BookingData'
 import User from '@/types/User'
-import { getCustomerNotes, getTimeString } from '@/lib/utils'
+import { getCustomerNotes, getRestaurantName, getTimeString } from '@/lib/utils'
 import Location from '@/types/Locations'
 import UserProfile from '@/types/UserProfile'
 
 const iconWidth = 20;
 
-const Customers = ({ bookings, selectedLocation, allLocations, userProfiles }: { bookings: BookingData[], selectedLocation: string, allLocations: Location[], userProfiles: UserProfile[] }) => {
+const Customers = ({ bookings, selectedLocation, allLocations, userProfiles, websiteUrl }: { bookings: BookingData[], selectedLocation: string, allLocations: Location[], userProfiles: UserProfile[], websiteUrl: string}) => {
 
   function isMaxStayDurationExceeded(startDateTime: Date, locationId: string) {
 
@@ -43,6 +41,7 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles }: {
         email,
         partySize,
         restaurantId,
+        locationId
       } = b;
 
       return (
@@ -57,6 +56,8 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles }: {
           partySize,
           customerNotes: getCustomerNotes(email, userProfiles),
           restaurantId,
+          websiteUrl: websiteUrl,
+          restaurantName: getRestaurantName(locationId,allLocations),
         }
       )
     }
@@ -113,10 +114,10 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles }: {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
       <div className='sm:col-span-1 lg:col-span-2'>
-        <DataCard title="Total Customers" value={allCustomerData.length} comment="+3 today" icon={<Users width={iconWidth} />} />
+        <DataCard title="Total Customers" value={allCustomerData.length} comment="" icon={<Users width={iconWidth} />} />
       </div> {/* Component B */}
       <div className='sm:col-span-1 lg:col-span-2'>
-        <DataCard title="Pending Reviews" value={pendingRevData.length} comment="+3 today" icon={<BadgeCheck width={iconWidth} />} />
+        <DataCard title="Pending Reviews" value={pendingRevData.length} comment="" icon={<BadgeCheck width={iconWidth} />} />
       </div> {/* Component C */}
       <div className="sm:col-span-2 lg:col-span-4 mt-4">
         <DataTable columns={reviewColumns} data={pendingRevData} title="Pending Reviews" hiddenColumns={["time", "partySize"]} defaultPageSize={5} />
@@ -124,7 +125,6 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles }: {
       <div className="sm:col-span-2 lg:col-span-4 mt-4">
         <DataTable columns={allCustomerColumns} data={allCustomerData} title="All Customers" hiddenColumns={[]} defaultPageSize={5} />
       </div> {/* Component F */}
-
     </div>
   )
 }

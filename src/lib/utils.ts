@@ -2,6 +2,7 @@ import UserProfile from "@/types/UserProfile"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import ImageObj from "../types/Website/ImageObj"
+import Location from "@/types/Locations"
 
 export const DAYS_OF_WEEK: string[] = [
   "monday",
@@ -154,4 +155,11 @@ export function getCustomerNotes(email: string, userProfiles: UserProfile[]){
   const user = userProfiles.find(u => u.id === email);
 
   return user?.notes ? user.notes : "";
+}
+
+//gets from LOCATION (idk bit confusing but fuck it)
+export function getRestaurantName(locationId:string, allLocations: Location[]){
+  const foundLocation = allLocations.find(l => l.locationId === locationId);
+
+  return foundLocation ? foundLocation.name : "";
 }

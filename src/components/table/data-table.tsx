@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 import * as React from "react"
 
@@ -49,6 +48,10 @@ import {
   ChevronsRight,
   SlidersHorizontal,
 } from "lucide-react"
+import { useToast } from "../ui/use-toast"
+import { doc, updateDoc } from "firebase/firestore"
+import { db } from "@/firebase/config"
+import { PendingReview } from "./pending-reviews-columns"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -59,7 +62,7 @@ interface DataTableProps<TData, TValue> {
 //used for setting required columns to hidden
 const falsify = (arr: string[]) => {
   let obj: { [key: string]: boolean } = {}; // Use valid property name and boolean type
-  arr.forEach((a, i) => {
+  arr.forEach((a) => {
     obj[a] = false;
   });
   return obj;
@@ -71,13 +74,13 @@ export function DataTable<TData, TValue>({
   title,
   hiddenColumns,
   defaultPageSize,
-}: DataTableProps<TData, TValue> & { title: string, hiddenColumns: string[], defaultPageSize: number }) {  
+}: DataTableProps<TData, TValue> & { title: string, hiddenColumns: string[], defaultPageSize: number }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({...falsify(hiddenColumns)})
+    React.useState<VisibilityState>({ ...falsify(hiddenColumns) })
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
@@ -97,8 +100,56 @@ export function DataTable<TData, TValue>({
     },
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    initialState: {pagination: {pageSize: defaultPageSize}}
+    initialState: { pagination: { pageSize: defaultPageSize } }
   })
+
+  const { toast } = useToast()
+
+  const handleSendReviews = async (rows: any[]) => {
+    const bookings = rows.map(r => r.original) as PendingReview[];
+
+      //send sms message
+      let smsPromises: Promise<any>[] = [];
+      bookings.forEach(b => {
+        smsPromises.push(fetch("https://us-central1-management-restaurants.cloudfunctions.net/api/bookings/sendReviewText", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': "willybum"
+          },
+          body: JSON.stringify({
+            phoneNumber: b.mobileNumber,
+            websiteUrl: b.websiteUrl,
+            restaurantName: b.restaurantName,
+          })
+        }))
+      })
+
+      /*await*/ Promise.all(smsPromises);
+
+      let promises: Promise<any>[] = [];
+
+      //update to review sent in database:
+      bookings.forEach(b => {
+        const docRef = doc(db, "bookings", b.id);
+        promises.push(updateDoc(docRef, {
+          sentReview: true,
+        }))
+      })
+
+      /*await*/ Promise.all(promises);
+
+
+      table.toggleAllPageRowsSelected(false);
+
+
+      toast({
+        title: "Reviews",
+        description: `Sent ${bookings.length} review${bookings.length > 1 ? "s" : ""}`,
+        duration: 1500,
+      })
+      console.log(bookings)
+  }
 
   return (
     <div>
@@ -187,8 +238,20 @@ export function DataTable<TData, TValue>({
 
       <div className="flex items-center justify-between px-2 mt-4 flex-wrap">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {(
+            title === "Pending Reviews" &&
+            <div className="flex items-center gap-4">
+              <Button disabled={table.getFilteredSelectedRowModel().rows.length === 0} onClick={() => handleSendReviews(table.getFilteredSelectedRowModel().rows)}>
+                Send Review
+              </Button>
+              <p>
+                {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                {table.getFilteredRowModel().rows.length} row(s) selected.
+              </p>
+            </div>
+
+          )}
+
         </div>
         <div className="flex items-center space-x-1 sm:space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">

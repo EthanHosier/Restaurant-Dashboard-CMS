@@ -19,4 +19,5 @@ export default interface Website {
   backgrounds: Backgrounds,
   images: string[],
   logo:string,
+  url: string,
 }

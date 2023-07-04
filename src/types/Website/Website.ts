@@ -20,4 +20,6 @@ export default interface Website {
   images: string[],
   logo:string,
   url: string,
+  offerGiftCards: boolean,
+  giftCardUrl: string,
 }

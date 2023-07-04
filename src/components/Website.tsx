@@ -17,6 +17,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { Checkbox } from './ui/checkbox';
 
 const emptyWebsite: WebsiteType = {
   colors: {
@@ -65,6 +66,8 @@ const emptyWebsite: WebsiteType = {
   },
   images: ["", "", "", "", "", ""],
   url: "",
+  offerGiftCards: false,
+  giftCardUrl: "",
 }
 
 const COLOR_NAME_MAP = {
@@ -96,7 +99,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
 
   useEffect(() => {
-    if(!storedWebsite) return;
+    if (!storedWebsite) return;
     setWebsiteData(storedWebsite);
   }, [storedWebsite])
 
@@ -281,13 +284,12 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
 
 
-  const handleTextChange = (e: any) => {
+  const handleTextChange = (e: any) => { //maybe pass key (name) and value in here directly?
     const temporaryWebsiteData = { ...websiteData };
     let key = e.target.name as keyof typeof temporaryWebsiteData;
     temporaryWebsiteData[key] = e.target.value;
     setWebsiteData({ ...temporaryWebsiteData })
     enableSaving();
-
   }
 
   const handleReviewTextChange = (text: string, index: number) => {
@@ -368,6 +370,20 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
     enableSaving();
   }
 
+  const toggleOfferGiftCards = () => {
+    const copyOfWebsiteData = { ...websiteData };
+    copyOfWebsiteData.offerGiftCards = !copyOfWebsiteData.offerGiftCards;
+    setWebsiteData({ ...copyOfWebsiteData });
+    enableSaving();
+  }
+
+  const handleGiftCardUrlChange = (url: string) => {
+    const copyOfWebsiteData = { ...websiteData };
+    copyOfWebsiteData.giftCardUrl = url;
+    setWebsiteData({ ...copyOfWebsiteData });
+    enableSaving();
+  }
+
   return (
     <div className='flex flex-col items-start'>
       {error && <p className='text-red-600'>Please contact support. Error: {error}</p>}
@@ -405,7 +421,6 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
           <Card className="p-4 mb-4">
 
-
             <CardTitle>General</CardTitle>
             <div className="my-4">
               <>
@@ -419,7 +434,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
                   value={websiteData.url}
                   className="w-full p-2 border border-gray-300 rounded mb-4"
                   disabled
-                  />
+                />
 
                 {Object.keys(COLOR_NAME_MAP).map((key, i) => {
 
@@ -456,6 +471,35 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
                 />
               </>
             </div>
+          </Card>
+
+          <Card className='mb-4 p-4'>
+            <CardTitle>Gift Cards</CardTitle>
+
+            <div className='flex items-center my-2 mt-4'>
+              <p className='mr-2'>Offer gift cards:</p>
+              <Checkbox
+                checked={websiteData.offerGiftCards ?? false}
+                onClick={toggleOfferGiftCards}
+              />
+            </div>
+
+            {websiteData.offerGiftCards &&
+              <div className='flex items-center'>
+                <p className='font-semibold mr-2'>URL</p>
+                <input
+                  type="text"
+                  id="url"
+                  name="url"
+                  value={websiteData.giftCardUrl}
+                  onChange={(e) => handleGiftCardUrlChange(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+
+            }
+
+
           </Card>
 
           <Card className='p-4 mb-4'>
@@ -696,7 +740,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
               {websiteData.socialMediaLinks.length > 0 &&
                 <div className='flex mt-4 w-8 mb-2'>
                   <p className='font-medium '>Type</p>
-                  <p className='ml-[106px] font-medium'>Url</p>
+                  <p className='ml-[106px] font-medium'>URL</p>
                 </div>
               }
 

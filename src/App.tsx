@@ -39,6 +39,7 @@ import { Toaster } from "@/components/ui/toaster"
 import NewAccount from '@/components/NewAccount'
 import { Link } from "react-router-dom"
 
+
 export default function App() {
   const auth = useAuth();
   const [bookings, setBookings] = useState<BookingData[]>([])
@@ -49,28 +50,28 @@ export default function App() {
   const [signedUrls, setSignedUrls] = useState<ImageObj>();
 
   const [loading, setLoading] = useState<Boolean>(true);
-  const [loadingAgain, setLoadingAgain] = useState<Boolean>(true);
 
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [selectedTab, setSelectedTab] = useState<string>("bookings")
 
   const [hasRestaurant, setHasRestaurant] = useState<boolean>();
 
+
   useEffect(() => {
     //console.log(auth.user)
-    if (!auth.user) {
-
-      if (!auth.loading) {
-        setLoadingAgain(false);
+    if (!auth.user || !auth) {
+        console.log("yeahh")
         setLoading(false);
-      }
       return
     };
 
     //check if restaurant exists
     getDoc(doc(db, "restaurants", auth.user.uid)).then((doc: any) => {
-      if (doc.exists()) setHasRestaurant(true);
-      setLoadingAgain(false);
+      if (doc.exists()) {
+        setHasRestaurant(true)
+      } else {
+        setHasRestaurant(false);
+      };
     })
 
     const unsubscribeLocationData = onSnapshot(collection(db, "restaurants", auth.user.uid, "locations"), (snapshot) => {
@@ -254,9 +255,9 @@ export default function App() {
 
 
   //hacky but oh well
-  return auth.loading || loading || loadingAgain ? (<Loadingpg />) :
+  return  auth.loading || loading || (!loading && hasRestaurant === undefined && auth.user) ? (<Loadingpg />) :
     !auth.user ? <Login /> :
-      !hasRestaurant ? <NewAccount /> :
+      hasRestaurant === false ? <NewAccount /> :
         (
           <main className="flex flex-col justify-between p-2 sm:p-4 md:p-8 lg:p-12 min-w-screen">
             <Card className='overflow-auto'>

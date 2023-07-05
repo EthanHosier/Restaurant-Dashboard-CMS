@@ -6,7 +6,7 @@ import { LogOut } from 'lucide-react';
 import { signOutUser } from '@/firebase/auth';
 
 const NewAccount = () => {
-
+  console.log("NEW ACCOUNT")
   const auth = useAuth();
   return (
     <main className="flex flex-col justify-between p-2 sm:p-4 md:p-8 lg:p-12 min-w-screen h-screen">

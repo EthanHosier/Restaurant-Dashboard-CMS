@@ -73,8 +73,6 @@ const Actionsbcs = ({ row }: { row: any }) => {
         description: `Booking at ${time} on ${formatDate(date)} cancelled.`,
       })
 
-    
-
       /*const res =*/ await fetch(URL, {
         method: "POST",
         headers: {

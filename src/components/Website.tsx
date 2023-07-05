@@ -356,13 +356,36 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
 
 
+  
   const handleTextChange = (e: any) => { //maybe pass key (name) and value in here directly?
     const temporaryWebsiteData = { ...websiteData };
-    let key = e.target.name as keyof typeof temporaryWebsiteData;
-    temporaryWebsiteData[key] = e.target.value;
+    let key = e.target.name;
+
+    switch (key) {
+      case "infoTitle": {
+        temporaryWebsiteData.infoTitle = e.target.value;
+        break;
+      }
+      case "infoText": {
+        temporaryWebsiteData.infoText = e.target.value;
+        break;
+      }
+      case "slogan": {
+        temporaryWebsiteData.slogan = e.target.value;
+        break;
+      }
+      case "hashtag": {
+        temporaryWebsiteData.hashtag = e.target.value;
+        break;
+      }
+    }
+  
     setWebsiteData({ ...temporaryWebsiteData })
     enableSaving();
   }
+
+  
+
 
   const handleReviewTextChange = (text: string, index: number) => {
     const temporaryWebsiteData = { ...websiteData };

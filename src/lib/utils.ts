@@ -74,6 +74,14 @@ export function dateIsPast(date: Date) {
   return date < new Date() && !dateIsToday(date);
 }
 
+export function formatDate(date: Date): string {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear());
+  
+  return `${day}/${month}/${year}`;
+}
+
 export function toTitleCase(str: string) {
   return str.replace(/\w\S*/g, function (word: string) {
     return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
@@ -174,3 +182,4 @@ export function extractFileType(dataUrl: string): string | null {
 
   return null;
 }
+

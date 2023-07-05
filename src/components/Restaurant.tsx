@@ -801,7 +801,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
                         }
                       </Card>
 
-                      <Card className='p-4 mt-4'>
+                      <Card className='p-4 mt-4 overflow-auto'>
                         <CardTitle className='mb-4'>
                           Review Options
                         </CardTitle>

@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dialog"
 
 import EditCutomerNotes from "./EditCustomerNotes";
+import Actionsbcs from "./Actions-bcs";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -207,78 +208,7 @@ export const columns: ColumnDef<Booking>[] = [
 
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger><MoreHorizontal /></DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-
-
-            <div className="w-full">
-              <Dialog>
-                <DialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
-                  <div className='flex items-center'>
-                    <p className='text-start text-sm mr-1'>View Comments</p>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Comments</DialogTitle>
-                    <DialogDescription>
-                      {row.original.comments || "--"}
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div className="w-full">
-              <Dialog>
-                <DialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
-                  <div className='flex items-center'>
-                    <p className='text-start text-sm mr-1'>View Customer Notes</p>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="mb-4">Customer Notes</DialogTitle>
-                    <EditCutomerNotes notes={row.original.customerNotes} email={row.original.email} restaurantId={row.original.restaurantId}/>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div className='w-full'>
-              <AlertDialog>
-                <AlertDialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
-                  <div className='flex items-center'>
-                    <p className='text-start text-sm mr-1'>Cancel Booking</p>
-                  </div>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. The customer will be alerted by email that their booking has been cancelled.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <div className="w-full">
-                    <div className="flex items-center">
-                      <Label htmlFor="name" className="text-right mr-4">
-                        Reason
-                      </Label>
-                      <Input id="name" className="col-span-3" onChange={(e) => onReasonChange(e.target.value)} />
-                    </div>
-                  </div>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Go Back</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancelBooking}>Cancel Booking</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Actionsbcs row={row}/>
       )
     },
   }

@@ -575,7 +575,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
                         name={key}
                         value={websiteData.colors[key as keyof typeof COLOR_NAME_MAP] ?? "#ffffff"}
                         onChange={(event) => handleColChange(key, event.target.value)}
-                        className="mb-8"
+                        className="mb-8 border"
                       />
                     </div>
                   )

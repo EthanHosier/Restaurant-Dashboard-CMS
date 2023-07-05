@@ -69,7 +69,7 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
 
   return (
     <>
-      <Link to={`https://d303vz01x9nm1g.cloudfront.net?restaurantId=${auth.user.uid}`} target={"_blank"} className='inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 mt-2 -mb-4 w-36'>
+      <Link to={`https://d303vz01x9nm1g.cloudfront.net?restaurantId=${auth.user.uid}`} target={"_blank"} className='hidden sm:inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 mt-2 -mb-4 w-36'>
         <div className='flex items-center'>
           <Plus size={16} color="white" /><p className='ml-1'>New Booking</p>
         </div>

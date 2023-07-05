@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { LogOut } from 'lucide-react'
+import { LogOut, Plus } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -37,6 +37,7 @@ import ImageObj from "./types/Website/ImageObj"
 import UserProfile from '@/types/UserProfile'
 import { Toaster } from "@/components/ui/toaster"
 import NewAccount from '@/components/NewAccount'
+import { Link } from "react-router-dom"
 
 export default function App() {
   const auth = useAuth();
@@ -49,7 +50,9 @@ export default function App() {
 
   const [loading, setLoading] = useState<Boolean>(true);
   const [loadingAgain, setLoadingAgain] = useState<Boolean>(true);
+
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [selectedTab, setSelectedTab] = useState<string>("bookings")
 
   const [hasRestaurant, setHasRestaurant] = useState<boolean>();
 
@@ -181,7 +184,7 @@ export default function App() {
 
     const websiteDocRef = doc(db, "websites", auth.user.uid);
 
-    const unsubWebsiteData = onSnapshot(websiteDocRef, { includeMetadataChanges: true },  async (snapshot) => {
+    const unsubWebsiteData = onSnapshot(websiteDocRef, { includeMetadataChanges: true }, async (snapshot) => {
 
       if (!snapshot.exists()) return;
 
@@ -269,7 +272,7 @@ export default function App() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="bookings" className="w-full">
+                <Tabs defaultValue="bookings" className="w-full" onValueChange={setSelectedTab}>
 
                   <div className='flex justify-between flex-col sm:flex-row'>
                     <TabsList className='w-[343px]'>
@@ -279,19 +282,31 @@ export default function App() {
                       <TabsTrigger value="website">Website</TabsTrigger>
                     </TabsList>
 
-                    <Select onValueChange={setSelectedLocation}>
-                      <SelectTrigger className="w-[180px] mt-4 sm:mt-0">
-                        <SelectValue placeholder="All Locations" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Locations</SelectItem>
-                        {
-                          locations.map((l, i) => (
-                            <SelectItem key={i} value={l.locationId} onClick={(e) => console.log(e)}>{l.name}, {l.location}</SelectItem>
-                          ))
-                        }
-                      </SelectContent>
-                    </Select>
+                    <div className="flex justify-between flex-1 mt-4 sm:mt-0 sm:justify-end">
+                      <Select onValueChange={setSelectedLocation}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="All Locations" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Locations</SelectItem>
+                          {
+                            locations.map((l, i) => (
+                              <SelectItem key={i} value={l.locationId} onClick={(e) => console.log(e)}>{l.name}, {l.location}</SelectItem>
+                            ))
+                          }
+                        </SelectContent>
+                      </Select>
+
+                      {
+                        selectedTab === "bookings" &&
+                        <Link to={`https://d303vz01x9nm1g.cloudfront.net?restaurantId=${auth.user.uid}`} target={"_blank"} className='inline-flex items-center justify-center rounded-md text-xs  font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 -mb-4 w-36 ml-4 sm:hidden'>
+                          <div className='flex items-center'>
+                            <Plus size={16} color="white" /><p className='ml-1'>New Booking</p>
+                          </div>
+                        </Link>
+                      }
+
+                    </div>
                   </div>
 
 

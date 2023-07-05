@@ -463,6 +463,12 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
   const handleExternalBookingSystemUrlChange = (url: string) => {
     websiteData.bookUrl = url;
+    setWebsiteData(w => ({ ...w }));
+    enableSaving();
+  }
+
+  const setName = (name: string) => {
+    websiteData.name = name;
     setWebsiteData(w => ({...w}));
     enableSaving();
   }
@@ -507,6 +513,19 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
             <CardTitle>General</CardTitle>
             <div className="my-4">
               <>
+                <label htmlFor="restaurantName" className="block font-medium mb-1">
+                  Restaurant Name
+                </label>
+                <input
+                  type="text"
+                  id="restaurantName"
+                  name="restaurantName"
+                  value={websiteData.name}
+                  className="w-full p-2 border border-gray-300 rounded mb-4"
+                  onChange={(e) => setName(e.target.value)}
+                />
+
+
                 <label htmlFor="location" className="block font-medium mb-1">
                   URL
                 </label>
@@ -561,7 +580,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
 
 
             {websiteData?.menus?.map((menu, i) => (
-              <div className={`flex flex-col ${i > 0 && "mt-4"}`}>
+              <div className={`flex flex-col ${i > 0 && "mt-4"}`} key={i}>
 
                 <div className='flex w-full justify-between items-center'>
                   <SetMenu src={menu.url} setMenu={setMenu} removeMenuUrl={removeMenuUrl} index={i} key={i} />

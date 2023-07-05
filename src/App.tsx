@@ -54,9 +54,13 @@ export default function App() {
   const [hasRestaurant, setHasRestaurant] = useState<boolean>();
 
   useEffect(() => {
+    //console.log(auth.user)
     if (!auth.user) {
-      setLoadingAgain(false);
-      setLoading(false);
+
+      if (!auth.loading) {
+        setLoadingAgain(false);
+        setLoading(false);
+      }
       return
     };
 
@@ -205,7 +209,7 @@ export default function App() {
       }));
 
 
-      
+
       await Promise.all(Object.keys(w.backgrounds).map(async (k) => {
         let key = k as keyof typeof w.backgrounds;
 
@@ -244,12 +248,8 @@ export default function App() {
       unsubWebsiteData();
       unsubUserProfiles();
     };
-  }, [auth.user])
+  }, [auth.user, auth]) //bruh idk
 
-
-  useEffect(() => {
-    console.log(auth)
-  }, [auth])
 
   //hacky but oh well
   return auth.loading || loading || loadingAgain ? (<Loadingpg />) :
@@ -297,7 +297,7 @@ export default function App() {
 
 
                   <TabsContent value="bookings"><Bookings bookings={bookings} selectedLocation={selectedLocation} userProfiles={userProfiles} /></TabsContent>
-                  <TabsContent value="customers"><Customers bookings={bookings} selectedLocation={selectedLocation} allLocations={locations} userProfiles={userProfiles} websiteUrl={websiteData?.url ?? ""}/></TabsContent>
+                  <TabsContent value="customers"><Customers bookings={bookings} selectedLocation={selectedLocation} allLocations={locations} userProfiles={userProfiles} websiteUrl={websiteData?.url ?? ""} /></TabsContent>
                   <TabsContent value="venues"><Restaurant bookings={bookings} locations={locations} /></TabsContent>
                   <TabsContent value="website"><Website storedWebsite={websiteData} signedUrls={signedUrls} /></TabsContent>
                 </Tabs>

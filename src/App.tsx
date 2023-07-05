@@ -181,10 +181,9 @@ export default function App() {
 
     const websiteDocRef = doc(db, "websites", auth.user.uid);
 
-    const unsubWebsiteData = onSnapshot(websiteDocRef, async (snapshot) => {
+    const unsubWebsiteData = onSnapshot(websiteDocRef, { includeMetadataChanges: true },  async (snapshot) => {
 
       if (!snapshot.exists()) return;
-
 
       const w = snapshot.data() as WebsiteType;
 

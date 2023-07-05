@@ -105,6 +105,7 @@ const Website = ({ storedWebsite, signedUrls }: { storedWebsite: WebsiteType | u
   useEffect(() => {
     if (!storedWebsite) return;
     setWebsiteData(storedWebsite);
+    console.log({storedWebsite})
   }, [storedWebsite])
 
   const enableSaving = () => setCanSave(true);

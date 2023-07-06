@@ -1,10 +1,9 @@
-import RingLoader from "react-spinners/RingLoader";
-
+import SyncLoader from "react-spinners/SyncLoader"
 
 const Loadingpg = () => {
   return (
     <div className='h-screen w-screen flex items-center justify-center'>
-      <RingLoader color='black'/>
+      <SyncLoader color='black'/>
     </div>
   )
 }

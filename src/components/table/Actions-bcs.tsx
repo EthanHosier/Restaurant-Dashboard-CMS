@@ -126,7 +126,7 @@ const Actionsbcs = ({ row }: { row: any }) => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="mb-4">Customer Notes</DialogTitle>
-                <EditCutomerNotes notes={row.original.customerNotes} email={row.original.email} restaurantId={row.original.restaurantId} />
+                <EditCutomerNotes notes={row.original.customerNotes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
               </DialogHeader>
             </DialogContent>
           </Dialog>

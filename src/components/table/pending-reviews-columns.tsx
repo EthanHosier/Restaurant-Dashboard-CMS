@@ -35,7 +35,7 @@ export type PendingReview = {
   time: String,
   firstName: String,
   surname: String,
-  mobileNumber: String,
+  mobileNumber: string,
   email: string,
   partySize: Number,
   customerNotes: string,
@@ -108,7 +108,7 @@ export const columns: ColumnDef<PendingReview>[] = [
         <HoverCard>
           <HoverCardTrigger>{truncateComment(notes || "--")}</HoverCardTrigger>
           <HoverCardContent>
-            <EditCutomerNotes notes={notes} email={row.original.email} restaurantId={row.original.restaurantId} />
+            <EditCutomerNotes notes={notes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
           </HoverCardContent>
         </HoverCard>
       )
@@ -142,7 +142,7 @@ export const columns: ColumnDef<PendingReview>[] = [
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle className="mb-4">Customer Notes</DialogTitle>
-                    <EditCutomerNotes notes={row.original.customerNotes} email={row.original.email} restaurantId={row.original.restaurantId}/>
+                    <EditCutomerNotes notes={row.original.customerNotes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId}/>
                   </DialogHeader>
                 </DialogContent>
               </Dialog>

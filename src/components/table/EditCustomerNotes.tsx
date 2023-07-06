@@ -4,15 +4,15 @@ import { useToast } from "@/components/ui/use-toast"
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
-const EditCutomerNotes = ({ notes, email, restaurantId }: { notes: string, email: string, restaurantId: string }) => {
+const EditCutomerNotes = ({ notes, number, restaurantId }: { notes: string, number: string, restaurantId: string }) => {
   const { toast } = useToast();
   const [disabled, setDisabled] = useState<boolean>(true)
 
   const onSubmit = (e: any) => {
     e.preventDefault();
-    const newNotes = e.target[`customerNotes${email}`].value;
+    const newNotes = e.target[`customerNotes${number}`].value;
 
-    setDoc(doc(db, "restaurants", restaurantId, "userProfiles", email), {
+    setDoc(doc(db, "restaurants", restaurantId, "userProfiles", number), {
       notes: newNotes,
       restaurantId,
     }).then(() =>
@@ -34,8 +34,8 @@ const EditCutomerNotes = ({ notes, email, restaurantId }: { notes: string, email
   return (
     <form onSubmit={onSubmit}>
       <textarea
-        id={`customerNotes${email}`}
-        name={`customerNotes${email}`}
+        id={`customerNotes${number}`}
+        name={`customerNotes${number}`}
         onChange = {() => setDisabled(false)}
         defaultValue={notes}
         className="w-full p-2 border border-gray-300 rounded"

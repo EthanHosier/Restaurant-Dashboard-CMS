@@ -379,7 +379,7 @@ const Restaurant = ({ /*bookings,*/ locations: existingLocations }: { bookings: 
         <>
           <Card className='w-full p-4 mt-4 bg-[#F1F5F9]'>
             <Card className="p-4 mb-4 w-full">
-              <CardTitle>Common Questions</CardTitle>
+              <CardTitle>Frequently Asked</CardTitle>
               <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                   <AccordionTrigger>Why aren't my URLs working?</AccordionTrigger>

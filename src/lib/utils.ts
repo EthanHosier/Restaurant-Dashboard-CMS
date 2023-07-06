@@ -159,8 +159,8 @@ export function truncateComment(str: string) {
 }
 
 //using email as id currently
-export function getCustomerNotes(email: string, userProfiles: UserProfile[]){
-  const user = userProfiles.find(u => u.id === email);
+export function getCustomerNotes(number: string, userProfiles: UserProfile[]){
+  const user = userProfiles.find(u => u.id === number);
 
   return user?.notes ? user.notes : "";
 }

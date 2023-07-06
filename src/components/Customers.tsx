@@ -54,7 +54,7 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles, web
           mobileNumber,
           email,
           partySize,
-          customerNotes: getCustomerNotes(email, userProfiles),
+          customerNotes: getCustomerNotes(mobileNumber, userProfiles),
           restaurantId,
           websiteUrl: websiteUrl,
           restaurantName: getRestaurantName(locationId,allLocations),
@@ -95,7 +95,7 @@ const Customers = ({ bookings, selectedLocation, allLocations, userProfiles, web
           surname,
           mobileNumber,
           email,
-          customerNotes: getCustomerNotes(email, userProfiles),
+          customerNotes: getCustomerNotes(mobileNumber, userProfiles),
           totalVisits: 1,
           restaurantId,
         }

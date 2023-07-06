@@ -57,7 +57,7 @@ const Bookings = ({ bookings, selectedLocation, userProfiles }: { bookings: Book
           location,
           restaurantId,
           messageId,
-          customerNotes: getCustomerNotes(email, userProfiles)
+          customerNotes: getCustomerNotes(mobileNumber, userProfiles)
         }
       )
     }).sort((a, b) => (new Date(a.date) as any) - (new Date(b.date) as any))

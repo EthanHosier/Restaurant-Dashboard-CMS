@@ -30,7 +30,7 @@ export type Customer = {
   id: string //this needs to be different regardless of user (as if have more than 1 review pending)
   firstName: String,
   surname: String,
-  mobileNumber: String,
+  mobileNumber: string,
   email: string,
   customerNotes: string,
   totalVisits: number,
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Customer>[] = [
         <HoverCard>
           <HoverCardTrigger>{truncateComment(notes || "--")}</HoverCardTrigger>
           <HoverCardContent>
-            <EditCutomerNotes notes={notes} email={row.original.email} restaurantId={row.original.restaurantId} />
+            <EditCutomerNotes notes={notes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
           </HoverCardContent>
         </HoverCard>
       )
@@ -99,7 +99,7 @@ export const columns: ColumnDef<Customer>[] = [
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle className="mb-4">Customer Notes</DialogTitle>
-                    <EditCutomerNotes notes={row.original.customerNotes} email={row.original.email} restaurantId={row.original.restaurantId} />
+                    <EditCutomerNotes notes={row.original.customerNotes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
                   </DialogHeader>
                 </DialogContent>
               </Dialog>

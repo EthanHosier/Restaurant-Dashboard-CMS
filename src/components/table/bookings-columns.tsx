@@ -24,7 +24,7 @@ export type Booking = {
   time: String,
   firstName: String,
   surname: String,
-  mobileNumber: String,
+  mobileNumber: string,
   email: string,
   partySize: Number,
   comments: String,
@@ -110,7 +110,7 @@ export const columns: ColumnDef<Booking>[] = [
         <HoverCard>
           <HoverCardTrigger>{truncateComment(notes || "--")}</HoverCardTrigger>
           <HoverCardContent>
-            <EditCutomerNotes notes={notes} email={row.original.email} restaurantId={row.original.restaurantId} />
+            <EditCutomerNotes notes={notes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
           </HoverCardContent>
         </HoverCard>
       )

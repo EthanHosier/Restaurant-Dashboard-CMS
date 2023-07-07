@@ -79,7 +79,7 @@ export const columns: ColumnDef<Booking>[] = [
     accessorKey: "mobileNumber",
     header: "Mobile Number",
     cell: ({ row }) => {
-      return <a href={`tel: +${row.original.mobileNumber}`}>+{row.original.mobileNumber}</a>
+      return <a href={`tel: ${row.original.mobileNumber}`}>{row.original.mobileNumber}</a>
     }
   },
   {

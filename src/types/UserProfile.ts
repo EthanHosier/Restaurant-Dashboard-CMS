@@ -1,4 +1,4 @@
-export default interface UserProfile{
-  id: string,
-  notes: string,
+export default interface UserProfile {
+  id: string;
+  notes: string;
 }

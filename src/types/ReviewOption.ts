@@ -1,4 +1,4 @@
-export default interface ReviewOption{
-  type: string,
-  url: string,
+export default interface ReviewOption {
+  type: string;
+  url: string;
 }

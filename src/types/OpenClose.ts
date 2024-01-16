@@ -1,4 +1,4 @@
-export default interface OpenClose{
-  open: string,
-  close: string,
+export default interface OpenClose {
+  open: string;
+  close: string;
 }

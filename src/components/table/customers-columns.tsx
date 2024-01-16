@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card"
-import {truncateComment } from "@/lib/utils"
+} from "@/components/ui/hover-card";
+import { truncateComment } from "@/lib/utils";
 import EditCutomerNotes from "./EditCustomerNotes";
 import {
   Dialog,
@@ -23,19 +23,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Customer = {
-  id: string //this needs to be different regardless of user (as if have more than 1 review pending)
-  firstName: String,
-  surname: String,
-  mobileNumber: string,
-  email: string,
-  customerNotes: string,
-  totalVisits: number,
-  restaurantId: string,
-}
+  id: string; //this needs to be different regardless of user (as if have more than 1 review pending)
+  firstName: String;
+  surname: String;
+  mobileNumber: string;
+  email: string;
+  customerNotes: string;
+  totalVisits: number;
+  restaurantId: string;
+};
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -63,15 +63,19 @@ export const columns: ColumnDef<Customer>[] = [
         <HoverCard>
           <HoverCardTrigger>{truncateComment(notes || "--")}</HoverCardTrigger>
           <HoverCardContent>
-            <EditCutomerNotes notes={notes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
+            <EditCutomerNotes
+              notes={notes}
+              number={row.original.mobileNumber}
+              restaurantId={row.original.restaurantId}
+            />
           </HoverCardContent>
         </HoverCard>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "totalVisits",
-    header: "Total visits"
+    header: "Total visits",
   },
   {
     id: "actions",
@@ -91,22 +95,28 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuSeparator />
             <div className="w-full">
               <Dialog>
-                <DialogTrigger className='hover:bg-[#F9FBFD] w-full justify-start p-2 rounded'>
-                  <div className='flex items-center'>
-                    <p className='text-start text-sm mr-1'>View Customer Notes</p>
+                <DialogTrigger className="hover:bg-[#F9FBFD] w-full justify-start p-2 rounded">
+                  <div className="flex items-center">
+                    <p className="text-start text-sm mr-1">
+                      View Customer Notes
+                    </p>
                   </div>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle className="mb-4">Customer Notes</DialogTitle>
-                    <EditCutomerNotes notes={row.original.customerNotes} number={row.original.mobileNumber} restaurantId={row.original.restaurantId} />
+                    <EditCutomerNotes
+                      notes={row.original.customerNotes}
+                      number={row.original.mobileNumber}
+                      restaurantId={row.original.restaurantId}
+                    />
                   </DialogHeader>
                 </DialogContent>
               </Dialog>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
-  }
-]
+  },
+];

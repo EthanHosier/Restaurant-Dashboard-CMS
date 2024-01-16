@@ -1,5 +1,5 @@
-export default interface Review{
-  source: string,
-  text: string,
-  link: string,
+export default interface Review {
+  source: string;
+  text: string;
+  link: string;
 }

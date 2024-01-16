@@ -1,4 +1,4 @@
-export default interface DropdownOption{
-  name: string,
-  url: string,
+export default interface DropdownOption {
+  name: string;
+  url: string;
 }

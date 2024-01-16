@@ -1,28 +1,27 @@
 import { createContext, useEffect, useMemo, useState } from "react";
-import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import { onAuthStateChanged, getAuth } from "firebase/auth";
 import app from "../firebase/config";
 
-const AuthContext = createContext({user: {uid: "", displayName: ""}, loading: true});
+const AuthContext = createContext({
+  user: { uid: "", displayName: "" },
+  loading: true,
+});
 const auth = getAuth(app);
 
-export const AuthProvider = ({ children }: {children: any}) => {
-
+export const AuthProvider = ({ children }: { children: any }) => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     let unsubBookingData: any = null;
     const authUnsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-      
         setUser(user);
         //console.log(user);
-
       } else {
         // User not logged in
         setUser(null);
-        console.log('logout');
+        console.log("logout");
       }
       setLoading(false);
     });
@@ -35,20 +34,19 @@ export const AuthProvider = ({ children }: {children: any}) => {
     };
   }, []);
 
-
-  const memoedValue = useMemo(() => ({
-    loading,
-    user,
-  }), [user, loading])
-
+  const memoedValue = useMemo(
+    () => ({
+      loading,
+      user,
+    }),
+    [user, loading]
+  );
 
   return (
-      <AuthContext.Provider value={{...memoedValue}}>
-        {children}
-      </AuthContext.Provider>
-
-  )
-
-}
+    <AuthContext.Provider value={{ ...memoedValue }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export default AuthContext;
